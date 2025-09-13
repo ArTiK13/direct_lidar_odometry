@@ -52,6 +52,8 @@
 #include <direct_lidar_odometry/save_traj.h>
 #include <nano_gicp/nano_gicp.hpp>
 
+#include <tf2_ros/transform_listener.h>
+
 typedef pcl::PointXYZI PointType;
 
 namespace dlo {

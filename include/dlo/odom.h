@@ -24,6 +24,8 @@ public:
   void stop();
 
 private:
+  tf2_ros::Buffer tfBuffer;
+  tf2_ros::TransformListener tfListener;
 
   void abortTimerCB(const ros::TimerEvent& e);
   void icpCB(const sensor_msgs::PointCloud2ConstPtr& pc);
@@ -246,5 +248,4 @@ private:
   double gicps2m_euclidean_fitness_ep_;
   int gicps2m_ransac_iter_;
   double gicps2m_ransac_inlier_thresh_;
-
 };
