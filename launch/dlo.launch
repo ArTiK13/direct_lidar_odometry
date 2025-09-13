@@ -11,11 +11,11 @@
 
   <arg name="robot_namespace" default="robot"/>
 
-  <arg name="pointcloud_topic" default="lidar"/>
+  <arg name="pointcloud_topic" default="/velodyne_points"/>
   <arg name="imu_topic" default="imu"/>
 
   <!-- DLO Odometry Node -->
-  <node ns="$(arg robot_namespace)" name="dlo_odom" pkg="direct_lidar_odometry" type="dlo_odom_node" output="screen" clear_params="true">
+  <node ns="$(arg robot_namespace)" name="dlo_odom" pkg="direct_lidar_odometry" type="dlo_odom_node" clear_params="true">
 
     <!-- Load parameters -->
     <rosparam file="$(find direct_lidar_odometry)/cfg/dlo.yaml" command="load"/>
