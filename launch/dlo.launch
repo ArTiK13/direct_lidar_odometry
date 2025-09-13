@@ -9,14 +9,13 @@
 
 <launch>
 
-  <arg name="robot_namespace" default="robot"/>
   <arg name="rviz" default="true"/>
 
   <arg name="pointcloud_topic" default="lidar"/>
   <arg name="imu_topic" default="imu"/>
 
   <!-- DLO Odometry Node -->
-  <node ns="$(arg robot_namespace)" name="dlo_odom" pkg="direct_lidar_odometry" type="dlo_odom_node" output="screen" clear_params="true">
+  <node name="dlo_odom" pkg="direct_lidar_odometry" type="dlo_odom_node" output="screen" clear_params="true">
 
     <!-- Load parameters -->
     <rosparam file="$(find direct_lidar_odometry)/cfg/dlo.yaml" command="load"/>
@@ -35,7 +34,7 @@
   </node>
 
   <!-- DLO Mapping Node -->
-  <node ns="$(arg robot_namespace)" name="dlo_map" pkg="direct_lidar_odometry" type="dlo_map_node" output="screen" clear_params="true">
+  <node name="dlo_map" pkg="direct_lidar_odometry" type="dlo_map_node" output="screen" clear_params="true">
 
     <!-- Load parameters -->
     <rosparam file="$(find direct_lidar_odometry)/cfg/dlo.yaml" command="load"/>

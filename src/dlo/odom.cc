@@ -16,7 +16,7 @@ std::atomic<bool> dlo::OdomNode::abort_(false);
  * Constructor
  **/
 
-dlo::OdomNode::OdomNode(ros::NodeHandle node_handle) : nh(node_handle) {
+dlo::OdomNode::OdomNode(ros::NodeHandle node_handle) : nh(node_handle), tfListener(tfBuffer) {
 
   this->getParams();
 
@@ -198,8 +198,8 @@ void dlo::OdomNode::getParams() {
   ns.erase(0,1);
 
   // Concatenate Frame Name Strings
-  this->odom_frame = ns + "/" + this->odom_frame;
-  this->child_frame = ns + "/" + this->child_frame;
+  // this->odom_frame = ns + "/" + this->odom_frame;
+  // this->child_frame = ns + "/" + this->child_frame;
 
   // Gravity alignment
   ros::param::param<bool>("~dlo/gravityAlign", this->gravity_align_, false);
@@ -486,7 +486,16 @@ void dlo::OdomNode::initializeInputTarget() {
 
   // initialize keyframes
   pcl::PointCloud<PointType>::Ptr first_keyframe (new pcl::PointCloud<PointType>);
-  pcl::transformPointCloud (*this->target_cloud, *first_keyframe, this->T);
+  try {
+  auto gt_T = tfBuffer.lookupTransform("map", "robot/base_link", ros::Time(0));
+  Eigen::Matrix4f gt_T_matrix = (Eigen::Translation3f(gt_T.transform.translation.x, gt_T.transform.translation.y, gt_T.transform.translation.z) * 
+                               Eigen::Quaternionf(gt_T.transform.rotation.w, gt_T.transform.rotation.x, gt_T.transform.rotation.y, gt_T.transform.rotation.z)).matrix();
+  pcl::transformPointCloud(*this->target_cloud, *first_keyframe, gt_T_matrix);
+  std::cout << "ok\n";
+  } catch (...) {
+    pcl::transformPointCloud(*this->target_cloud, *first_keyframe, this->T);
+    std::cout << "no tf\n";
+  }
 
   // voxelization for submap
   if (this->vf_submap_use_) {
@@ -975,7 +984,18 @@ void dlo::OdomNode::propagateS2M() {
 
 void dlo::OdomNode::transformCurrentScan() {
   this->current_scan_t = pcl::PointCloud<PointType>::Ptr (new pcl::PointCloud<PointType>);
-  pcl::transformPointCloud (*this->current_scan, *this->current_scan_t, this->T);
+  try {
+  auto gt_T = tfBuffer.lookupTransform("map", "robot/base_link", ros::Time(0));
+  Eigen::Matrix4f gt_T_matrix = (Eigen::Translation3f(gt_T.transform.translation.x, gt_T.transform.translation.y, gt_T.transform.translation.z) * 
+                               Eigen::Quaternionf(gt_T.transform.rotation.w, gt_T.transform.rotation.x, gt_T.transform.rotation.y, gt_T.transform.rotation.z)).matrix();
+  pcl::transformPointCloud(*this->current_scan, *this->current_scan_t,
+                           gt_T_matrix);
+  std::cout << "ok\n";
+  } catch (...) {
+    pcl::transformPointCloud(*this->current_scan, *this->current_scan_t,
+                             this->T);
+    std::cout << "no tf\n";
+  }
 }
 
 

@@ -8,7 +8,7 @@
 #############################################################
 
 cmake_minimum_required(VERSION 3.10.0)
-project(direct_lidar_odometry)
+project(direct_lidar_odometry_mapping)
 
 add_compile_options(-std=c++14)
 set(CMAKE_BUILD_TYPE "Release")
@@ -78,25 +78,25 @@ if(HAS_CPUID)
 endif()
 
 # NanoFLANN
-add_library(nanoflann STATIC
+add_library(nanoflann2 STATIC
   src/nano_gicp/nanoflann.cc
 )
-target_link_libraries(nanoflann ${PCL_LIBRARIES})
-target_include_directories(nanoflann PUBLIC include ${PCL_INCLUDE_DIRS})
+target_link_libraries(nanoflann2 ${PCL_LIBRARIES})
+target_include_directories(nanoflann2 PUBLIC include ${PCL_INCLUDE_DIRS})
 
 # NanoGICP
-add_library(nano_gicp STATIC
+add_library(nano_gicp2 STATIC
   src/nano_gicp/lsq_registration.cc
   src/nano_gicp/nano_gicp.cc
 )
-target_link_libraries(nano_gicp ${PCL_LIBRARIES} ${OpenMP_LIBS} nanoflann)
-target_include_directories(nano_gicp PUBLIC include ${PCL_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR})
+target_link_libraries(nano_gicp2 ${PCL_LIBRARIES} ${OpenMP_LIBS} nanoflann2)
+target_include_directories(nano_gicp2 PUBLIC include ${PCL_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR})
 
 # Odometry Node
-add_executable(dlo_odom_node src/dlo/odom_node.cc src/dlo/odom.cc)
-add_dependencies(dlo_odom_node ${catkin_EXPORTED_TARGETS})
-target_compile_options(dlo_odom_node PRIVATE ${OpenMP_FLAGS})
-target_link_libraries(dlo_odom_node ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenMP_LIBS} Threads::Threads nano_gicp)
+add_executable(dlo_odom_node2 src/dlo/odom_node.cc src/dlo/odom.cc)
+add_dependencies(dlo_odom_node2 ${catkin_EXPORTED_TARGETS})
+target_compile_options(dlo_odom_node2 PRIVATE ${OpenMP_FLAGS})
+target_link_libraries(dlo_odom_node2 ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenMP_LIBS} Threads::Threads nano_gicp2)
 
 # Mapping Node
 add_executable (dlo_map_node src/dlo/map_node.cc src/dlo/map.cc)
